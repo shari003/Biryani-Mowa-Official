@@ -1,6 +1,8 @@
 'use client';
 import { createContext, useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
+import { v4 as uuid } from 'uuid'
+import toast from "react-hot-toast";
 
 export const CartContext = createContext({});
 
@@ -16,10 +18,11 @@ export default function AppProvider({children}){
         }
     }, []);
 
-    function removeCartProduct(prodId){
-        const filtered = cartProducts.filter(item => item._id !== prodId);
+    function removeCartProduct(cartId){
+        const filtered = cartProducts.filter(item => item.cartId !== cartId);
         setCartProducts(filtered);
         saveCartToLS(filtered); 
+        toast.success(`Item removed!`)
     }
 
     function clearCart(){
@@ -39,7 +42,7 @@ export default function AppProvider({children}){
             sizes.push(size);
         }
         setCartProducts(prev => {
-            const newProduct = {...product, sizes}; 
+            const newProduct = {...product, sizes, cartId: uuid()}; 
             const newProducts = [...prev, newProduct];
             saveCartToLS(newProducts);
             return newProducts;

@@ -1,6 +1,7 @@
 'use client';
 import AdminTabs from '@/components/AdminTabs';
 import EditableImage from '@/components/EditableImage';
+import UserAddressInputs from '@/components/layout/UserAddressInputs';
 import { useSession } from 'next-auth/react'
 import Image from 'next/image';
 import Link from 'next/link';
@@ -101,6 +102,20 @@ export default function ProfilePage() {
         }
     }
 
+    function handleAddressChange(type: 'phone'| 'streetAddress' | 'city' | 'postal' | 'country', val: string){
+        if(type === 'phone'){
+            setPhone(val);
+        } else if(type === 'city'){
+            setCity(val);
+        } else if(type === 'country'){
+            setCountry(val);
+        } else if(type === 'postal'){
+            setPostal(val);
+        } else {
+            setStreetAddress(val);
+        }
+    }
+
     return (
         <section className='mt-8'> 
 
@@ -121,26 +136,8 @@ export default function ProfilePage() {
                         <label>Email</label>
                         <input type="email" value={session.data?.user?.email as string} disabled={true} />
 
-                        <label>Phone Number</label>
-                        <input type="tel" placeholder='Phone' value={phone} onChange={(e) => setPhone(e.target.value)} />
+                        <UserAddressInputs addressProps={{phone, streetAddress, city, postal, country}} setAddressProps={handleAddressChange} />
 
-                        <label>Street address</label>
-                        <input type="text" placeholder='Street address' value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} />
-
-                        <div className="flex gap-2">
-                            <div>
-                                <label>City</label>
-                                <input type="text" placeholder='City' value={city} onChange={(e) => setCity(e.target.value)} />
-                            </div>
-                            
-                            <div>
-                                <label>Postal Code</label>
-                                <input type="text" placeholder='Postal code' value={postal} onChange={(e) => setPostal(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <label>Country</label>
-                        <input type="text" placeholder='Country' value={country} onChange={(e) => setCountry(e.target.value)} />
                         <button type='submit'>Save</button>
                     </form>
                 </div>

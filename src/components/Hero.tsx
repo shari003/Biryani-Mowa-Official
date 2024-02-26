@@ -21,7 +21,7 @@ export default function Hero() {
                 </div>
             </div>
             <div className='w-22 h-22 relative'>
-                <Image src={MAIN_DISH} alt='MAIN_DISH' width={500} height={500} className='pl-20' /> 
+                <Image src={MAIN_DISH} alt='MAIN_DISH' width={400} height={400} className='ml-44' /> 
             </div>
         </section>
     )

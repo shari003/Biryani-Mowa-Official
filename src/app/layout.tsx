@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={roboto.className} style={{backgroundColor: '#f7e9da'}}>
-        <main className="max-w-4xl mx-auto p-4">
+        <main className="max-w-5xl mx-auto p-4">
           <AppProvider>
             <Toaster />
             <Header />
