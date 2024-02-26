@@ -60,7 +60,7 @@ export default function HomeMenu() {
             {menuItems.length > 0 ? (  
                 <div className="grid grid-cols-3 gap-4">
                     {menuItems.map(item => (
-                        <MenuCard key={item._id} image_url={item.menuImg} title={item.itemName} subtitle={item.itemDesc} price={item.itemPrice} priority={item.priority} />
+                        <MenuCard key={item._id} item={item} />
                     ))}
                 </div>
             ) : (

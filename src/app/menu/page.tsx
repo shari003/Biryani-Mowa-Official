@@ -59,7 +59,7 @@ export default function MenuPage() {
                     </div>
                     <div className='grid grid-cols-3 gap-4 mt-6 mb-12'>
                         {menuItems.filter(item => item.category === cat.name).map(item => (
-                            <MenuCard key={item._id} image_url={item.menuImg} title={item.itemName} subtitle={item.itemDesc} price={item.itemPrice} priority={item.priority} />
+                            <MenuCard key={item._id} item={item} />
                         ))}
                     </div>
                 </div>

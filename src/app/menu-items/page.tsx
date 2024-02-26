@@ -66,7 +66,7 @@ export default function MenuItems() {
             </div>
             <div>
                 {menuItems.length > 0 ? (
-                    <h2 className='text-sm text-slate-500 mt-8 mb-1'>Edit Menu Items:</h2>
+                    <h2 className='text-sm text-slate-500 mt-8 mb-1'>Click to edit Menu Items:</h2>
                 ) : (
                     <h2 className='text-center text-xl text-slate-500 mt-8 mb-1'>No Menu Items to display</h2>
                 )}
