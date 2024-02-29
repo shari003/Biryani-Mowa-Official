@@ -39,8 +39,6 @@ export default function MenuCard({ item }: Props) {
   const [showPopUp, setShowPopUp] = useState<boolean>(false);
   const [selectedSize, setSelectedSize] = useState<SizeType | null>(sizes?.[0] || null);
 
-  console.log(selectedSize);
-
   const { addToCart, cartProducts }: ContextType = useContext<any>(CartContext);
 
   function handleAddToCart(item: MenuItemType, size: SizeType | null) {

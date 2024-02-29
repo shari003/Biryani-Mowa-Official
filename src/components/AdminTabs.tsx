@@ -14,6 +14,7 @@ export default function AdminTabs({isAdmin}: Props) {
     return (
         <div className="flex gap-2 justify-center tabs">
             <Link className={path === '/profile' ? 'active': ''} href={'/profile'}>Profile</Link>
+            <Link className={path === '/orders' ? 'active': ''} href={'/orders'}>My Orders</Link>
             {isAdmin && (
                 <>
                     <Link className={path === '/categories' ? 'active': ''} href={'/categories'}>Categories</Link>

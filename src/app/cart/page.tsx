@@ -2,9 +2,11 @@
 import { CartContext } from '@/components/AppContext';
 import SectionHeaders from '@/components/SectionHeaders';
 import Trash from '@/components/icons/Trash';
+import BillDetails from '@/components/layout/BillDetails';
 import UserAddressInputs from '@/components/layout/UserAddressInputs';
 import useProfileCheck from '@/components/useProfileCheck';
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import React, { useContext, useEffect, useState } from 'react'
 
 type SizeType = {
@@ -25,13 +27,24 @@ type MenuItemType = {
     category: string;
     priority: PriorityType;
     cartId: string;
+    updatedAt: string;
+    createdAt: string;
 };
 
 type ContextType = {
     addToCart: (item: MenuItemType, size: SizeType | null) => void;
     cartProducts: MenuItemType[];
     removeCartProduct: (prodId: string) => void;
+    clearCart: () => void;
 };
+
+type CouponType = {
+    couponCode: string,
+    couponCodeLabel: 'Apply' | 'Invalid' | 'Applied',
+    couponApplyStatus: boolean,
+    couponError: boolean,
+    couponDetails: string
+}
 
 export function calcCartProductPrice(cartProd: MenuItemType) {
     let price = Number(cartProd.itemPrice);
@@ -55,29 +68,42 @@ export default function CartPage() {
     const {userData} = useProfileCheck();    
     const [address, setAddress] = useState({});
 
+    const [redirection, setRedirection] = useState(false);
+    const [orderDetails, setOrderDetails] = useState({
+        orderId: '',
+        orderStatus: ''
+    });
+
     const [totalCartPrice, setTotalCartPrice] = useState(0);
+    const [discountedPrice, setDiscountedPrice] = useState(0);
+    const [finalCartPrice, setFinalCartPrice] = useState(0);
+    
 
-    const [couponCode, setCouponCode] = useState('');
-    const [couponCodeLabel, setCouponCodeLabel] = useState('Apply');
-    const [couponApplyStatus, setCouponApplyStatus] = useState(false);
-    const [couponError, setCouponError] = useState(false);
-    const [couponDetails, setCouponDetails] = useState('');
+    const couponInitialState: CouponType = {
+        couponCode: '',
+        couponCodeLabel: 'Apply',
+        couponApplyStatus: false,
+        couponError: false,
+        couponDetails: ''
+    };
 
-    const { cartProducts, removeCartProduct }: ContextType = useContext<any>(CartContext);
+    const [coupon, setCoupon] = useState<CouponType>(couponInitialState);
+
+
+    const { cartProducts, clearCart, removeCartProduct }: ContextType = useContext<any>(CartContext);
 
     useEffect(() => {
-        setTotalCartPrice(calcCartProductsPrice(cartProducts));
+        const totalCartValue = calcCartProductsPrice(cartProducts);
+
+        setTotalCartPrice(totalCartValue);
+        setFinalCartPrice(totalCartValue);
     }, [cartProducts])
 
     useEffect(() => {
-        if(couponCode.length === 0){
-            setCouponApplyStatus(false);
-            setCouponCodeLabel('Apply');
-            setCouponError(false);
-            setCouponDetails('');
-            setTotalCartPrice(calcCartProductsPrice(cartProducts));
+        if(coupon.couponCode.length === 0){
+            couponToInitialState();
         }
-    }, [couponCode, cartProducts])
+    }, [coupon.couponCode])
 
     useEffect(() => {
         if(userData){
@@ -87,29 +113,78 @@ export default function CartPage() {
         }
     }, [userData]);
 
-    function handleCoupon(){
-        if(couponCode.length > 0 && !couponApplyStatus){
-            // COUPON Validation
-            let couponValid = true;
-            if(couponValid) {
-                const discount = 10/100;
-                setCouponApplyStatus(true);
-                setCouponError(false);
-                setCouponDetails('10% discount availed!!');
-                setTotalCartPrice(prev => prev-(prev*discount));
-                setCouponCodeLabel('Applied');
-            } else {
-                setCouponApplyStatus(true);
-                setCouponCodeLabel('Invalid');
-                setCouponError(true);
-                setCouponDetails('Invalid coupon code');
-                setTotalCartPrice(calcCartProductsPrice(cartProducts));
-            }
+    async function placeOrder(ev: React.FormEvent<HTMLFormElement>) {
+        ev.preventDefault();
+
+        const filteredCartProducts = cartProducts.map(prod => {
+            const {itemDesc, cartId, category, menuImg, priority, createdAt, updatedAt, ...newObj} = prod;
+            return newObj;
+        })
+
+        // save cartProducts[] and the address to be sent to STRIPE
+        const res = await fetch('/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                cartProducts: filteredCartProducts,
+                address,
+                cartValue: totalCartPrice,
+                finalCartValue: finalCartPrice,
+                discountValue: discountedPrice,
+                couponApplied: coupon.couponCode
+            })
+        });
+        const data = await res.json();
+        // via backend, backend would send us a link for STRIPE ReDIRECTION
+        if(res.ok){
+            setOrderDetails({orderId: data.orderId, orderStatus: data.orderStatus});
+            setRedirection(true);
         }
-    }
+    }  
 
     function handleAddressChange(type: 'phone'| 'streetAddress' | 'city' | 'postal' | 'country', val: string) {
         setAddress(prev =>  ({...prev, [type]: val}))
+    }
+
+    function couponToInitialState() {
+        setCoupon(couponInitialState);
+        setDiscountedPrice(0);
+        const totalCartValue = calcCartProductsPrice(cartProducts);
+
+        setFinalCartPrice(totalCartValue);
+    }
+
+    function handleCoupon(){
+        if(coupon.couponCode.length > 0){
+            // validation check of coupon code.
+            // if valid
+            if(coupon.couponCode === 'THIS'){
+                setCoupon(prev => ({...prev, couponApplyStatus: true}));
+                setCoupon(prev => ({...prev, couponCodeLabel: 'Applied'}));
+                setCoupon(prev => ({...prev, couponDetails: ''}));
+                setCoupon(prev => ({...prev, couponError: false}));
+                const discount = 10/100;
+                const discountedPrice = totalCartPrice*discount;
+                setDiscountedPrice(discountedPrice);
+                const finalCartValue = totalCartPrice-discountedPrice;
+                setFinalCartPrice(finalCartValue);
+            } else {
+                setCoupon(prev => ({...prev, couponApplyStatus: true}));
+                setCoupon(prev => ({...prev, couponCodeLabel: 'Invalid'}));
+                setCoupon(prev => ({...prev, couponDetails: 'Invalid Coupon Code'}));
+                setCoupon(prev => ({...prev, couponError: true}));
+                setDiscountedPrice(0);
+                setFinalCartPrice(totalCartPrice);
+            }
+        }
+    }
+    
+    if(redirection){
+        clearCart();
+        setRedirection(false);
+        return redirect(`/checkout?orderId=${orderDetails.orderId}&orderStatus=${orderDetails.orderStatus}`);
     }
 
     return (
@@ -157,37 +232,66 @@ export default function CartPage() {
                         </div>
                         <div className='col-span-4'>
                             <div className='bg-slate-300 p-4 rounded-lg '>
-                                <h2>Checkout</h2>
-                                <form>
+                                <h2>Order Summary</h2>
+                                <form onSubmit={placeOrder}>
                                     <UserAddressInputs addressProps={address} setAddressProps={handleAddressChange} />
                                     
                                     
                                     <div className="grid grid-cols-12 items-center gap-2">
                                         <div className='col-span-9'>
                                             <label>Apply Coupon</label>
-                                            <input type="text" placeholder='Coupon code' value={couponCode} onChange={e => setCouponCode(e.target.value)} />
+                                            <input type="text" placeholder='Coupon code' value={coupon.couponCode} onChange={e => setCoupon(prev => ({...prev, couponCode: e.target.value}))} />
                                         </div>
                                         
                                         <div className='mt-4 col-span-3'>
                                             <button 
                                                 onClick={handleCoupon}
                                                 className='pl-2 border-0 rounded' type='button'>
-                                                    {couponCodeLabel}
+                                                    {coupon.couponCodeLabel}
                                             </button>
                                         </div>
                                     </div>
-                                    {couponApplyStatus && !couponError && (
+                                    {/* {couponApplyStatus && !couponError && (
                                         <div className='pb-2 text-green-700'>
                                             {couponDetails}
                                         </div>
-                                    )}
-                                    {couponApplyStatus && couponError && (
+                                    )} */}
+                                    {coupon.couponApplyStatus && coupon.couponError && (
                                         <div className='pb-2 text-red-700'>
-                                            {couponDetails}
+                                            {coupon.couponDetails}
                                         </div>
                                     )}
 
-                                    <button type="submit">Pay &#8377;{totalCartPrice}</button>
+                                    <div>
+                                        <h1 className='my-4 pt-4 uppercase border-solid border-t-2 w-full border-t-slate-600'>Bill Details</h1>
+                                        <div className='flex mb-3 justify-between text-sm'>
+                                            <div>
+                                                <span className='block my-1'>Price ({cartProducts.length} item{cartProducts.length > 1 ? 's' : ''})</span>
+                                                <span className='block my-1'>Delivery Charges</span>
+                                                <span className='block my-1'>Discount</span>
+                                            </div>
+                                            <div className='text-right'>
+                                                <span className='block my-1'>&#8377;{totalCartPrice}</span>
+                                                <span className='text-green-600 block my-1'>FREE</span>
+                                                <span className='text-green-600 block my-1'>- &#8377;{discountedPrice}</span>
+                                            </div>
+                                        </div>
+                                        <div className='text-lg flex justify-between border-dotted border-y-2 py-2 w-full border-y-slate-600 mb-4'>
+                                            <span className='block'>Total Amount</span>
+                                            <span className='block text-right'>&#8377;{finalCartPrice}</span>
+                                        </div>
+                                        {discountedPrice !== 0 && (
+                                            <div className='pb-4 text-green-600'>
+                                                You will save &#8377;{discountedPrice} on this Order.
+                                            </div>
+                                        )}
+                                    </div>
+{/*                                     
+                                    <div className='mt-3 border-solid border-t-2 w-full border-t-slate-600'>
+                                        <BillDetails header='Bill Details' cartProducts={cartProducts} totalCartPrice={totalCartPrice} discountedPrice={discountedPrice} finalCartPrice={finalCartPrice} />
+                                    </div> */}
+
+                                    <button type="submit">Checkout</button>
                                 </form>
                             </div>
                         </div>
