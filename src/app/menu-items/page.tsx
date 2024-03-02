@@ -66,12 +66,12 @@ export default function MenuItems() {
             </div>
             <div>
                 {menuItems.length > 0 ? (
-                    <h2 className='text-sm text-slate-500 mt-8 mb-1'>Click to edit Menu Items:</h2>
+                    <h2 className='text-base text-center md:text-left md:text-sm text-slate-500 mt-8 mb-1'>Click to edit Menu Items:</h2>
                 ) : (
                     <h2 className='text-center text-xl text-slate-500 mt-8 mb-1'>No Menu Items to display</h2>
                 )}
                 
-                <div className='flex flex-wrap justify-start gap-2'>
+                <div className='flex flex-wrap justify-center md:justify-start  gap-2'>
                     {menuItems.length > 0 && menuItems.map((item: MenuItem) => (
                         <Link href={`/menu-items/edit/${item._id}`} key={item._id}>
                             <div className='bg-slate-300 rounded-lg p-3 flex flex-col items-center gap-2 h-52 w-52'>

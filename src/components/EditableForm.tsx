@@ -76,72 +76,74 @@ export default function EditableForm({isAdmin, formType, handleFormSubmit, menuI
                     Go to Menu Items
                 </Link>
             </div>
-            <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSubmit(e)} className='mt-8 max-w-xl mx-auto'>
-                <div className="flex gap-4 items-start">
-                    <div className="">
+            <div className='mt-8 max-w-xl mx-auto'>
+                <div className="md:flex gap-4 items-start">
+                    <div className="w-1/2 md:w-1/5 mx-auto md:mx-0">
                         <EditableImage link={menuImg} setLink={setMenuImg} height={85} width={85} />
                     </div>
                     <div className='grow'>
-                        <label>Item name</label>
-                        <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+                        <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSubmit(e)}>
+                            <label>Item name</label>
+                            <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
 
-                        <label>Description</label>
-                        <input type="text" value={itemDesc} onChange={(e) => setItemDesc(e.target.value)} />
-                        
-                        <label>Base Price</label>
-                        <input type="text" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                            <label>Description</label>
+                            <input type="text" value={itemDesc} onChange={(e) => setItemDesc(e.target.value)} />
+                            
+                            <label>Base Price</label>
+                            <input type="text" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
 
-                        {categories.length > 0 && (
-                            <>
-                                <label>Category</label>
-                                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                                    {categories.map(cat => (
-                                        <option key={cat._id}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </>
-                        )}
+                            {categories.length > 0 && (
+                                <>
+                                    <label>Category</label>
+                                    <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                                        {categories.map(cat => (
+                                            <option key={cat._id}>{cat.name}</option>
+                                        ))}
+                                    </select>
+                                </>
+                            )}
 
-                        <label>Priority</label>
-                        <div className='my-2 flex gap-2'>
-                            <label className='flex gap-2'>
-                                <input
-                                    type="radio"
-                                    value="yes"
-                                    checked={isPriority}
-                                    onChange={() => handlePriorityChange(true)}
-                                    />
-                                Yes
-                            </label>
-                            <label className='flex gap-2'>
-                                <input
-                                    type="radio"
-                                    value="no"
-                                    checked={!isPriority}
-                                    onChange={() => handlePriorityChange(false)}
-                                    />
-                                No
-                            </label>
-                        </div>
+                            <label>Priority</label>
+                            <div className='my-2 flex gap-2'>
+                                <label className='flex gap-2'>
+                                    <input
+                                        type="radio"
+                                        value="yes"
+                                        checked={isPriority}
+                                        onChange={() => handlePriorityChange(true)}
+                                        />
+                                    Yes
+                                </label>
+                                <label className='flex gap-2'>
+                                    <input
+                                        type="radio"
+                                        value="no"
+                                        checked={!isPriority}
+                                        onChange={() => handlePriorityChange(false)}
+                                        />
+                                    No
+                                </label>
+                            </div>
 
-                        {isPriority && (
-                            <>
-                                <label>Priority Label</label>
-                                <input type="text" value={priorityLabel} onChange={(e) => setPriorityLabel(e.target.value)} />
-                            </>
-                        )}
-                        
+                            {isPriority && (
+                                <>
+                                    <label>Priority Label</label>
+                                    <input type="text" value={priorityLabel} onChange={(e) => setPriorityLabel(e.target.value)} />
+                                </>
+                            )}
+                            
 
-                        <EditableSize items={sizes} setItems={setSizes} formType='Sizes' addBtnLabel='Add new item size' />
+                            <EditableSize items={sizes} setItems={setSizes} formType='Sizes' addBtnLabel='Add new item size' />
 
-                        <button type='submit'>{formType === 'ADD_MENU' ? 'Save' : 'Update'}</button>
+                            <button type='submit'>{formType === 'ADD_MENU' ? 'Save' : 'Update'}</button>
 
-                        {formType === 'EDIT_MENU' && (
-                            <DeleteConfirmation label='Delete Menu Item' onDelete={() => handleDelete(menuItem?._id!)} />
-                        )}
+                            {formType === 'EDIT_MENU' && (
+                                <DeleteConfirmation label='Delete Menu Item' onDelete={() => handleDelete(menuItem?._id!)} />
+                            )}                            
+                        </form>
                     </div>
                 </div>
-            </form>
+            </div>
         </section>
     )
 }

@@ -92,7 +92,7 @@ export default function MenuCard({ item }: Props) {
                     <input
                       type="radio"
                       name={size.name}
-                      onClick={() => setSelectedSize(size)}
+                      onChange={() => setSelectedSize(size)}
                       checked={selectedSize?._id === size._id}
                     />
                     <span className="px-1">{size.name}</span>

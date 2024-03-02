@@ -52,7 +52,7 @@ export default function EditableImage({link, setLink, height=190, width=190}: Pr
             {link !== undefined && link !== '' ? (
                 <Image className='rounded-lg w-full h-full mb-1' src={link} width={width} height={height} alt='user_avatar' />
             ) : (
-                <div className='bg-slate-200 p-4 text-slate-500 rounded-lg mb-4'>
+                <div className='bg-slate-200 p-4 text-slate-500 rounded-lg mb-4 text-center'>
                     No Image
                 </div>
             )}

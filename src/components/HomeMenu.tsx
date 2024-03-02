@@ -54,11 +54,11 @@ export default function HomeMenu() {
             </div> */}
 
 
-            <div className='text-center mb-4'>
+            <div className='text-center mt-8 mb-4'>
                 <SectionHeaders subHeader='Our Best Sellers' mainHeader='Menu' />
             </div>
             {menuItems.length > 0 ? (  
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid sm:grid-cols-3 gap-4">
                     {menuItems.map(item => (
                         <MenuCard key={item._id} item={item} />
                     ))}

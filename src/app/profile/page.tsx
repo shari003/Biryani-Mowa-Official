@@ -122,7 +122,7 @@ export default function ProfilePage() {
             <AdminTabs isAdmin={isAdmin} />
 
             <div className='max-w-2xl mx-auto mt-8'>
-                <div className='flex gap-2'>
+                <div className='md:flex gap-2'>
                     <div>
                         <div className="p-2 rounded-lg relative">
                             <EditableImage link={userImg} setLink={setUserImg} height={100} width={100} />

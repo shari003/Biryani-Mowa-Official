@@ -53,8 +53,6 @@ export default function OrderPage() {
                 method: 'GET'
             });
             const data = await res.json(); 
-            console.log(data);
-              
             if(res.ok) setOrder(data);
         }
 
@@ -82,7 +80,7 @@ export default function OrderPage() {
             <div className="my-4">
                 <p>Thanks for placing your Order.</p>
             </div>
-            <div className='my-4 text-left'>
+            <div className='my-4 text-balance md:text-left'>
                 <h1 className='text-xl font-semibold'>
                     Order Status: 
                     <span className={`${order?.orderStatus === 'DELIVERED' ? 'text-green-600' : order?.orderStatus === 'PLACED' ? 'text-blue-600' : 'text-red-600'}`}> {order?.orderStatus}
@@ -95,8 +93,9 @@ export default function OrderPage() {
             <div>
                 {order !== null && (
                     <>
-                        <div className='grid grid-cols-12 gap-8'>
-                            <div className='col-span-8 flex flex-col'>
+                        <div className='md:grid grid-cols-12 gap-8 mt-8'>
+                            <div className='col-span-8 flex flex-col p-4'>
+                                <h1 className='text-left font-semibold text-black text-xl'>Items in this order</h1>
                                 {order.cartProducts !== undefined && order.cartProducts.map((item) => (
                                     <CartProductLayout trashIcon={false} key={item._id} prod={item} />
                                     ))}
@@ -104,9 +103,10 @@ export default function OrderPage() {
                             
                             <div className='col-span-4'>
                                 <div className="text-slate-300 p-4 rounded-md text-left">
+                                    <h1 className='font-semibold text-black text-xl'>Delivery Address</h1>
                                     <UserAddressInputs setAddressProps={() => {}} addressProps={obj} disabled={true} />
                                 </div>
-                                <div className='text-left mt-8'>
+                                <div className='text-left p-4'>
                                     <BillDetails header='BILLING' cartProducts={order.cartProducts} totalCartPrice={order.cartValue} finalCartPrice={order.finalCartValue} discountedPrice={order.discountValue} />
                                 </div>
                             </div>

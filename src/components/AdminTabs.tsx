@@ -13,7 +13,7 @@ export default function AdminTabs({isAdmin}: Props) {
     const params = useSearchParams();
 
     return (
-        <div className="flex gap-2 justify-center tabs">
+        <div className="flex flex-wrap gap-3 sm:gap-2 justify-center tabs">
             <Link className={path === '/profile' ? 'active': ''} href={'/profile'}>Profile</Link>
             <Link className={!params.get('admin') && path === '/orders' ? 'active': ''} href={'/orders'}>My Orders</Link>
             {isAdmin && (

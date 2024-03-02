@@ -11,7 +11,7 @@ import { redirect, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 export default function OrdersPage() {
-    const {isAdmin} = useProfileCheck();
+    const {isAdmin, loading} = useProfileCheck();
     const [orders, setOrders] = useState<any>([]);
     const params = useSearchParams();   
 
@@ -40,7 +40,9 @@ export default function OrdersPage() {
         }
     }, [params.get('admin')]);
 
-    if(params.get('admin') && params.get('admin') !== null && !isAdmin){
+    const notAnAdmin = params.get('admin') && params.get('admin') !== null && !isAdmin && loading;
+    
+    if(notAnAdmin){
         return redirect('/orders');
     }
 
@@ -48,7 +50,7 @@ export default function OrdersPage() {
         <section className='mt-8'>
             <AdminTabs isAdmin={isAdmin} />
             <div className="text-center my-8">
-                <SectionHeaders mainHeader={'Your Orders'} />
+                <SectionHeaders mainHeader={notAnAdmin === null ? 'Your Orders' : 'All Orders'} />
             </div>
             {orders.length > 0 ? (
                 <div>

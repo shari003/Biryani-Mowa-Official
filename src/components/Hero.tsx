@@ -6,7 +6,7 @@ import Right from './icons/Right'
 export default function Hero() {
     return (
         <section className='hero mt-4'>
-            <div className='py-14'>
+            <div className='py-4 md:py-14'>
                 <h1 className='text-4xl font-semibold'>We will make you start love affair in our <span className='text-primary'>Biryani</span></h1>
                 <p className='my-6 text-slate-500 text-sm'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil dignissimos eveniet repudiandae possimus ut nam quasi aperiam animi repellat, at</p>
                 <div className='flex gap-4 text-sm'>
@@ -20,7 +20,7 @@ export default function Hero() {
                     </button>
                 </div>
             </div>
-            <div className='w-22 h-22 relative'>
+            <div className='w-22 h-22 relative hidden md:block'>
                 <Image src={MAIN_DISH} alt='MAIN_DISH' width={400} height={400} className='ml-44' /> 
             </div>
         </section>

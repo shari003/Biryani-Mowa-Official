@@ -167,12 +167,12 @@ export default function CartPage() {
         if(coupon.couponCode.length > 0){
             // validation check of coupon code.
             // if valid
-            if(coupon.couponCode === 'THIS'){
+            if(coupon.couponCode === 'MOWABRO5'){
                 setCoupon(prev => ({...prev, couponApplyStatus: true}));
                 setCoupon(prev => ({...prev, couponCodeLabel: 'Applied'}));
                 setCoupon(prev => ({...prev, couponDetails: ''}));
                 setCoupon(prev => ({...prev, couponError: false}));
-                const discount = 10/100;
+                const discount = 5/100;
                 const discountedPrice = totalCartPrice*discount;
                 setDiscountedPrice(discountedPrice);
                 const finalCartValue = totalCartPrice-discountedPrice;
@@ -200,7 +200,7 @@ export default function CartPage() {
                 <SectionHeaders mainHeader='Your cart' />
             </div>
                 {cartProducts.length > 0 ? (
-                    <div className='grid grid-cols-12 gap-7 mt-8'>
+                    <div className='md:grid grid-cols-12 gap-7 mt-8'>
                         <div className='col-span-8'>
                             {cartProducts.map(prod => (
                                 <CartProductLayout key={prod._id} prod={prod} />
@@ -210,9 +210,9 @@ export default function CartPage() {
                                 <span className='font-semibold'>&#8377;{totalCartPrice}</span>
                             </div>
                         </div>
-                        <div className='col-span-4'>
+                        <div className='col-span-4 mt-8 md:mt-0'>
                             <div className='bg-slate-300 p-4 rounded-lg '>
-                                <h2>Order Summary</h2>
+                                <h2 className='font-semibold text-black text-xl'>Order Summary</h2>
                                 <form onSubmit={placeOrder}>
                                     <UserAddressInputs addressProps={address} setAddressProps={handleAddressChange} />
                                     
@@ -253,7 +253,7 @@ export default function CartPage() {
                                             <div className='text-right'>
                                                 <span className='block my-1'>&#8377;{totalCartPrice}</span>
                                                 <span className='text-green-600 block my-1'>FREE</span>
-                                                <span className='text-green-600 block my-1'>- &#8377;{discountedPrice}</span>
+                                                <span className='text-green-600 block my-1'>- &#8377;{discountedPrice.toFixed()}</span>
                                             </div>
                                         </div>
                                         <div className='text-lg flex justify-between border-dotted border-y-2 py-2 w-full border-y-slate-600 mb-4'>
@@ -262,7 +262,7 @@ export default function CartPage() {
                                         </div>
                                         {discountedPrice !== 0 && (
                                             <div className='pb-4 text-green-600'>
-                                                You will save &#8377;{discountedPrice} on this Order.
+                                                You will save &#8377;{discountedPrice.toFixed()} on this Order.
                                             </div>
                                         )}
                                     </div>
