@@ -1,5 +1,6 @@
 import Order from "@/app/models/Orders";
 import { NextRequest, NextResponse } from "next/server";
+import { isAdmin } from "../../auth/[...nextauth]/route";
 
 type ParamType = {
     params: {
@@ -19,12 +20,15 @@ export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
 
 export async function PUT(req: NextRequest, {params: {_id}}: ParamType) {
     try {
-        const data = await req.json();
-
-        const order = await Order.findByIdAndUpdate(_id, data, {new: true});
-        if(!order) throw new Error('Something went wrong')               ;
+        if(await isAdmin()){
+            const data = await req.json();
+            const order = await Order.findByIdAndUpdate(_id, data, {new: true});
+            if(!order) throw new Error('Something went wrong')               ;
+            return NextResponse.json(order);
+        } else {
+            return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
+        }
         
-        return NextResponse.json(order);
     } catch (err: any) {
         return NextResponse.json({error: err.message}, {status: 500});
     }

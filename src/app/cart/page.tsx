@@ -3,6 +3,7 @@ import { CartContext } from '@/components/AppContext';
 import SectionHeaders from '@/components/SectionHeaders';
 import Trash from '@/components/icons/Trash';
 import BillDetails from '@/components/layout/BillDetails';
+import CartProductLayout from '@/components/layout/CartProductLayout';
 import UserAddressInputs from '@/components/layout/UserAddressInputs';
 import useProfileCheck from '@/components/useProfileCheck';
 import Image from 'next/image';
@@ -66,7 +67,13 @@ export function calcCartProductsPrice(cartProds: MenuItemType[]) {
 export default function CartPage() {
 
     const {userData} = useProfileCheck();    
-    const [address, setAddress] = useState({});
+    const [address, setAddress] = useState({
+        phone: '', 
+        streetAddress: '', 
+        city: '', 
+        postal: '', 
+        country: ''
+    });
 
     const [redirection, setRedirection] = useState(false);
     const [orderDetails, setOrderDetails] = useState({
@@ -117,7 +124,7 @@ export default function CartPage() {
         ev.preventDefault();
 
         const filteredCartProducts = cartProducts.map(prod => {
-            const {itemDesc, cartId, category, menuImg, priority, createdAt, updatedAt, ...newObj} = prod;
+            const {itemDesc, cartId, category, priority, createdAt, updatedAt, ...newObj} = prod;
             return newObj;
         })
 
@@ -196,34 +203,7 @@ export default function CartPage() {
                     <div className='grid grid-cols-12 gap-7 mt-8'>
                         <div className='col-span-8'>
                             {cartProducts.map(prod => (
-                                <div key={prod._id} className='flex items-start gap-4 py-4 my-2 border-b border-b-slate-400'>
-                                    <div className='w-24'>
-                                        {/* Left */}
-                                        <Image className='rounded-lg' src={prod.menuImg} alt='DISH' width={240} height={240} />
-                                    </div>
-                                    <div className='flex flex-col grow'>
-                                        {/* Right */}
-                                        <h1 className='font-semibold'>
-                                            {prod.itemName}
-                                        </h1>
-                                        {prod.sizes && prod.sizes.map(size => (
-                                            <div key={size._id} className='text-sm text-slate-700'>
-                                                <h3>Size: <span>{size.name}</span></h3>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className='flex flex-col items-center gap-2'>
-                                        <h1 className='text-lg font-semibold'>&#8377;{calcCartProductPrice(prod)}</h1>
-                                        <div>
-                                            <button 
-                                                type='button'
-                                                onClick={() => removeCartProduct(prod.cartId)}
-                                                className='p-2 border-1 border-red-600 text-red-600 hover:bg-red-600 hover:text-white'>
-                                                <Trash />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <CartProductLayout key={prod._id} prod={prod} />
                             ))}
                             <div className='py-4 text-right pr-3 text-xl'>
                                 <span className='text-slate-500'>Subtotal: </span>

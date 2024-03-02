@@ -1,7 +1,7 @@
 import { connect } from "@/app/dbConfig/dbConfig";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions, isAdmin } from "../auth/[...nextauth]/route";
 import Order from "@/app/models/Orders";
 // import Stripe from "stripe";
 
@@ -70,12 +70,20 @@ import Order from "@/app/models/Orders";
 
 export async function GET(req: NextRequest) {
     try {
+        const admin = req.nextUrl.searchParams.get('admin');
+        const orders = req.nextUrl.searchParams.get('orders');
         const session = await getServerSession(authOptions);
         const userEmail = session?.user?.email!;
 
-        const orders = await Order.find({userEmail: userEmail});
-
-        return NextResponse.json(orders);
+        if(admin && orders === 'all' && await isAdmin() && session?.user){
+            const allUserOrders =  await Order.find();   
+            return NextResponse.json(allUserOrders);
+        } else if(session?.user) {
+            const userOrders = await Order.find({userEmail: userEmail});   
+            return NextResponse.json(userOrders);
+        } else {
+            return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
+        }
     } catch (error: any) {
         return NextResponse.json({error: error.message}, {status: 500});
     }

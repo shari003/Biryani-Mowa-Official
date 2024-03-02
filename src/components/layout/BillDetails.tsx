@@ -34,7 +34,7 @@ export default function BillDetails({header, cartProducts, totalCartPrice, disco
    
     return (
         <div>
-            <h1 className='mb-2 uppercase w-full border-solid border-b-2 border-b-slate-600'>{header}</h1>
+            <h1 className='mb-2 uppercase w-full border-solid border-b-2 border-b-slate-600 text-xl'>{header}</h1>
             <div className='flex mb-3 justify-between text-sm'>
                 <div>
                     <span className='block my-1'>Price ({cartProducts.length} item{cartProducts.length > 1 ? 's' : ''})</span>

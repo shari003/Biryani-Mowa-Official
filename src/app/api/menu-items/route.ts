@@ -1,21 +1,24 @@
 import { connect } from "@/app/dbConfig/dbConfig";
 import MenuItem from "@/app/models/MenuItems";
 import { NextRequest, NextResponse } from "next/server";
+import { isAdmin } from "../auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
     try {
-        const data = await req.json();        
-        const newMenuItem = new MenuItem(data);
-        const saveMenuItem = await newMenuItem.save();
-        return NextResponse.json(saveMenuItem.itemName);
-
+        if(await isAdmin()){
+            const data = await req.json();        
+            const newMenuItem = new MenuItem(data);
+            const saveMenuItem = await newMenuItem.save();
+            return NextResponse.json(saveMenuItem.itemName);
+        }else {
+            return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
+        }
     }catch(err: any){
         return NextResponse.json({error: err.message}, {status: 500});
     }
 }
 
 export async function GET(req: NextRequest) {
-    connect();
     try {
         let menuItems = await MenuItem.find(); 
         const noPriorityItems = menuItems.filter(item => item.priority.isPriority === false);
@@ -29,9 +32,13 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
     try {
-        const {_id, ...data} = await req.json();
-        const doc = await MenuItem.findByIdAndUpdate(_id, data, {new: true});
-        return NextResponse.json(doc.itemName);
+        if(await isAdmin()){
+            const {_id, ...data} = await req.json();
+            const doc = await MenuItem.findByIdAndUpdate(_id, data, {new: true});
+            return NextResponse.json(doc.itemName);
+        }else {
+            return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
+        }
     }catch(err: any){
         return NextResponse.json({error: err.message}, {status: 500});
     }

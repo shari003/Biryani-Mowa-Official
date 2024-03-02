@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import SectionHeaders from '@/components/SectionHeaders';
 import BillDetails from '@/components/layout/BillDetails';

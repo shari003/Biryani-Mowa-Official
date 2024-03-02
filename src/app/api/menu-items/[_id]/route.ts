@@ -1,5 +1,6 @@
 import MenuItem from "@/app/models/MenuItems";
 import { NextRequest, NextResponse } from "next/server";
+import { isAdmin } from "../../auth/[...nextauth]/route";
 
 type ParamType = {
     params: {
@@ -9,8 +10,12 @@ type ParamType = {
 
 export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
     try {
-        const menuItem = await MenuItem.findOne({_id});
-        return NextResponse.json(menuItem)
+        if(await isAdmin()){
+            const menuItem = await MenuItem.findOne({_id});
+            return NextResponse.json(menuItem)
+        } else {
+            return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
+        }
     } catch (err: any) {
         return NextResponse.json({error: err.message}, {status: 500});
     }
@@ -18,8 +23,12 @@ export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
 
 export async function DELETE(req: NextRequest, {params: {_id}}: ParamType) {
     try {
-        const menuItem = await MenuItem.findByIdAndDelete({_id});
-        return NextResponse.json(menuItem)
+        if(await isAdmin()){
+            const menuItem = await MenuItem.findByIdAndDelete({_id});
+            return NextResponse.json(menuItem)
+        } else {
+            return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
+        }
     } catch (err: any) {
         return NextResponse.json({error: err.message}, {status: 500});
     }
