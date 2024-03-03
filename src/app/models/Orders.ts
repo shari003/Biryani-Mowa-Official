@@ -15,7 +15,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: 'INITIATED',
         enum: {
-            values: ['INITIATED', 'PLACED', 'CANCELED', 'SHIPPED', 'RECIEVED'],
+            values: ['INITIATED', 'PLACED', 'CANCELED', 'ON THE WAY', 'DELIVERED'],
             message: `{VALUE} is not supported`
         },
     },

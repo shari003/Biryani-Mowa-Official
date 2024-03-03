@@ -21,7 +21,6 @@ export async function PUT(req: NextRequest){
 
 export async function GET() {
     try {
-        connect();
         const serverSession = await getServerSession(authOptions);
         const email = serverSession?.user?.email;
 
@@ -33,5 +32,17 @@ export async function GET() {
     }catch(err: any){
         return NextResponse.json({error: err.message})
     }
-    
+}
+
+export async function POST(req: NextRequest){
+    try {
+        const {userEmail} = await req.json();
+        if(!userEmail) throw new Error('No User Email Provided!')
+
+        const user = await User.findOne({email: userEmail}).select('-password');
+        return NextResponse.json(user);
+
+    }catch(err: any){
+        return NextResponse.json({error: err.message})
+    }
 }
