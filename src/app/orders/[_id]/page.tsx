@@ -203,7 +203,7 @@ export default function OrderPage() {
                 {isAdmin && (
                     <>
                         <h1 className='text-lg font-semibold'>
-                            Payment Status: 
+                            Payment Status:
                             {editToggle ? (
                                 <div className='max-w-xs text-sm'>
                                     <select value={selectedPaymentStatus} onChange={(e) => setSelectedPaymentStatus(e.target.value)}>
@@ -213,7 +213,7 @@ export default function OrderPage() {
                                     </select>
                                 </div>
                             ) : (
-                                <span className={`p-2 rounded-md text-white ${order?.paymentStatus ? 'bg-green-600' : 'bg-red-600'}`}>
+                                <span className={`ml-2 p-2 rounded-md text-white ${order?.paymentStatus ? 'bg-green-600' : 'bg-red-600'}`}>
                                     {order?.paymentStatus ? 'PAID' : 'NOT PAID'}
                                 </span>
                             )}

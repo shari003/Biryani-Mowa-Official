@@ -72,7 +72,7 @@ export default function HomeMenu() {
                     ))}
                 </div>
             ) : (
-                <h1>Loading Menu Items</h1>
+                <h1 className='text-center text-xl font-semibold'>No Menu Items to show</h1>
             )}
 
             {/* <div className="grid grid-cols-3 gap-4">

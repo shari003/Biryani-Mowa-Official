@@ -1,9 +1,11 @@
 import User from "@/app/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "../auth/[...nextauth]/route";
+import { connect } from "@/app/dbConfig/dbConfig";
 
 export async function GET(req: NextRequest) {
     try {
+        connect();
         const users = await User.find().lean();
         if(await isAdmin()){
             return NextResponse.json(users);
@@ -17,6 +19,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
     try {
+        connect();
         if(await isAdmin()){
             const data = await req.json();
             const {userId, actionType} = data;

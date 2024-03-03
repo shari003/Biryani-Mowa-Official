@@ -2,6 +2,7 @@ import Order from "@/app/models/Orders";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions, isAdmin } from "../../auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
+import { connect } from "@/app/dbConfig/dbConfig";
 
 type ParamType = {
     params: {
@@ -11,6 +12,7 @@ type ParamType = {
 
 export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
     try {
+        connect();
         const session = await getServerSession(authOptions);
         if(session?.user){
             const order = await Order.findOne({_id});
@@ -26,6 +28,7 @@ export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
 
 export async function PUT(req: NextRequest, {params: {_id}}: ParamType) {
     try {
+        connect();
         if(await isAdmin()){
             const data = await req.json();
             const order = await Order.findByIdAndUpdate(_id, data, {new: true});

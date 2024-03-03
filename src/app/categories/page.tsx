@@ -44,7 +44,7 @@ export default function CategoriesPage() {
         return redirect('/login');
     } else if(!isAdmin && loading) {
         return redirect('/profile');
-    } else if(status === 'loading' || fetchLoading || categories.length === 0){
+    } else if(status === 'loading' || fetchLoading){
         return <ShimmerSpinner />
     }
     

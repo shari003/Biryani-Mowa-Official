@@ -56,7 +56,7 @@ export default function MenuItems() {
         return redirect('/login');
     } else if(!isAdmin && loading) {
         return redirect('/profile');
-    } else if(status === 'loading' || fetchLoading || menuItems.length === 0 || !loading){
+    } else if(status === 'loading' || fetchLoading || !loading){
         return <ShimmerSpinner />
     }
 

@@ -54,7 +54,7 @@ export default function OrdersPage() {
         return redirect('/orders');
     }
 
-    if(status === 'loading' || fetchLoading || orders.length === 0){
+    if(status === 'loading' || fetchLoading){
         return <ShimmerSpinner />;
     } else if(status === 'unauthenticated'){
         return redirect('/login');

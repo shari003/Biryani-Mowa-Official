@@ -70,6 +70,7 @@ import Order from "@/app/models/Orders";
 
 export async function GET(req: NextRequest) {
     try {
+        connect();
         const admin = req.nextUrl.searchParams.get('admin');
         const orders = req.nextUrl.searchParams.get('orders');
         const session = await getServerSession(authOptions);
@@ -91,6 +92,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest){
     try {
+        connect();
         const {address, cartProducts, cartValue, finalCartValue, discountValue, couponApplied} = await req.json();
         const session = await getServerSession(authOptions);
         const userEmail = session?.user?.email!;

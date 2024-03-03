@@ -21,6 +21,7 @@ export async function PUT(req: NextRequest){
 
 export async function GET() {
     try {
+        connect();
         const serverSession = await getServerSession(authOptions);
         const email = serverSession?.user?.email;
 
@@ -36,6 +37,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest){
     try {
+        connect();
         const {userEmail} = await req.json();
         if(!userEmail) throw new Error('No User Email Provided!')
 
