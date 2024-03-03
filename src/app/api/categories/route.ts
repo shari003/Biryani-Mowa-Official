@@ -2,9 +2,11 @@ import Category from "@/app/models/Category";
 import MenuItem from "@/app/models/MenuItems";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "../auth/[...nextauth]/route";
+import { connect } from "@/app/dbConfig/dbConfig";
 
 export async function GET(req: NextRequest) {
     try {
+        connect();
         const categories = await Category.find().lean();
         return NextResponse.json(categories);
     } catch (error: any) {
@@ -14,7 +16,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-
+        connect();
         if(await isAdmin()){
             const d = await req.json();
         
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
     try {
-
+        connect();
         if(await isAdmin()){
             const data = await req.json();    
             if('categoryName' in data && '_id' in data){
@@ -56,6 +58,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
+        connect();
         if(await isAdmin()){
             const data = await req.json();
             if('_id' in  data){

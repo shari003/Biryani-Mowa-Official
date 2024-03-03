@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import MenuCard from './MenuCard'
 import SectionHeaders from './SectionHeaders'
+import ShimmerSpinner from './shimmer/ShimmerSpinner';
 
 type SizeType = {
     name: string,
@@ -25,8 +26,10 @@ type MenuItem = {
 export default function HomeMenu() {
 
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);    
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         const fetchMenuItems = async() => {
             const res = await fetch('/api/menu-items', {
                 method: 'GET',
@@ -35,13 +38,18 @@ export default function HomeMenu() {
             if(res.ok){
                 const data = await res.json();
                 setMenuItems(data);
+                setLoading(false);
             }
 
         }
-
         fetchMenuItems();
 
-    }, [])
+    }, []);
+
+    if(loading){
+        return <ShimmerSpinner />
+    }
+
     return (
         <section>
             {/* <div className="absolute h-full left-0 right-0 w-full justify-start">

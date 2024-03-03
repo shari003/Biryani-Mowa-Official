@@ -5,6 +5,7 @@ import { isAdmin } from "../auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
     try {
+        connect();
         if(await isAdmin()){
             const data = await req.json();        
             const newMenuItem = new MenuItem(data);
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
+        connect();
         let menuItems = await MenuItem.find(); 
         const noPriorityItems = menuItems.filter(item => item.priority.isPriority === false);
         const priorityItems = menuItems.filter(item => item.priority.isPriority === true);
@@ -32,6 +34,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
     try {
+        connect();
         if(await isAdmin()){
             const {_id, ...data} = await req.json();
             const doc = await MenuItem.findByIdAndUpdate(_id, data, {new: true});

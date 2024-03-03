@@ -1,6 +1,7 @@
 'use client';
 import MenuCard from '@/components/MenuCard';
 import SectionHeaders from '@/components/SectionHeaders';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import React, { useEffect, useState } from 'react'
 
 type CategoryType = {_id: string, name: string};
@@ -28,8 +29,10 @@ export default function MenuPage() {
 
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [categories, setCategories] = useState<CategoryType[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         const fetchCategories = async() => {
             const res = await fetch('/api/categories', {
                 method: 'GET',
@@ -48,7 +51,12 @@ export default function MenuPage() {
 
         fetchMenuItems();
         fetchCategories();
-    }, [])
+        setLoading(false);
+    }, []);
+
+    if(loading || categories.length === 0 || menuItems.length == 0){
+        return <ShimmerSpinner />
+    }
 
     return (
         <section className='mt-8'>

@@ -1,6 +1,7 @@
 import MenuItem from "@/app/models/MenuItems";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "../../auth/[...nextauth]/route";
+import { connect } from "@/app/dbConfig/dbConfig";
 
 type ParamType = {
     params: {
@@ -10,6 +11,7 @@ type ParamType = {
 
 export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
     try {
+        connect();
         if(await isAdmin()){
             const menuItem = await MenuItem.findOne({_id});
             return NextResponse.json(menuItem)
@@ -23,6 +25,7 @@ export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
 
 export async function DELETE(req: NextRequest, {params: {_id}}: ParamType) {
     try {
+        connect();
         if(await isAdmin()){
             const menuItem = await MenuItem.findByIdAndDelete({_id});
             return NextResponse.json(menuItem)

@@ -1,6 +1,7 @@
 'use client';
 import AdminTabs from '@/components/AdminTabs'
 import Edit from '@/components/icons/Edit';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import useProfileCheck from '@/components/useProfileCheck';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
@@ -18,6 +19,7 @@ export default function UsersPage() {
 
     const {status} = useSession();
     const {loading, isAdmin} = useProfileCheck();
+    const [fetchLoading, setFetchLoading] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
 
     const fetchAllUsers = async() => {
@@ -27,13 +29,17 @@ export default function UsersPage() {
     }
 
     useEffect(() => {
+        setFetchLoading(true);
         fetchAllUsers();
+        setFetchLoading(false);
     }, [])
 
     if(status === 'unauthenticated'){
         return redirect('/login');
     } else if(!isAdmin && loading) {
         return redirect('/profile');
+    } else if(status === 'loading' || fetchLoading || users.length === 0){
+        return <ShimmerSpinner />
     }
 
     async function changeUserStatus(userId: string, actionType: 'USER' | 'ADMIN'){

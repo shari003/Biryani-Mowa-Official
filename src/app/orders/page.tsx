@@ -4,6 +4,7 @@
 import AdminTabs from '@/components/AdminTabs';
 import SectionHeaders from '@/components/SectionHeaders';
 import OrderSlabs from '@/components/layout/OrderSlabs';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import useProfileCheck from '@/components/useProfileCheck';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -11,12 +12,17 @@ import { redirect, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 export default function OrdersPage() {
+
+    const session = useSession();
+    const {status} = session;
     const {isAdmin, loading} = useProfileCheck();
     const [orders, setOrders] = useState<any>([]);
+    const [fetchLoading, setFetchLoading] = useState(false);
     const params = useSearchParams();   
 
     useEffect(() => {
         setOrders([]);
+        setFetchLoading(true);
         async function getUsersAllOrders() {
             const res = await fetch('/api/orders', {
                 method: 'GET'
@@ -38,12 +44,20 @@ export default function OrdersPage() {
         } else {   
             getUsersAllOrders();
         }
+
+        setFetchLoading(false);
     }, [params.get('admin')]);
 
     const notAnAdmin = params.get('admin') && params.get('admin') !== null && !isAdmin && loading;
     
     if(notAnAdmin){
         return redirect('/orders');
+    }
+
+    if(status === 'loading' || fetchLoading || orders.length === 0){
+        return <ShimmerSpinner />;
+    } else if(status === 'unauthenticated'){
+        return redirect('/login');
     }
 
     return (
@@ -61,8 +75,8 @@ export default function OrdersPage() {
                     ))}
                 </div>
             ) : (
-                <div className='text-center'>
-                    No Orders
+                <div className='text-center text-2xl font-semibold'>
+                    No Orders to show.
                 </div>
             )}
         </section>

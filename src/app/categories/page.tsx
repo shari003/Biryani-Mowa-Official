@@ -3,6 +3,7 @@
 import AdminTabs from '@/components/AdminTabs'
 import Edit from '@/components/icons/Edit';
 import Trash from '@/components/icons/Trash';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import useProfileCheck from '@/components/useProfileCheck';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
@@ -18,7 +19,7 @@ export default function CategoriesPage() {
     const [categoryName, setCategoryName] = useState('');
     const [categories, setCategories] = useState([]);
     const [editCategory, setEditCategory] = useState<Category | null | undefined>(null);
-    
+    const [fetchLoading, setFetchLoading] = useState(false);
     const {loading, isAdmin} = useProfileCheck();
 
     const fetchCategories = async() => {
@@ -34,17 +35,20 @@ export default function CategoriesPage() {
     }
 
     useEffect(() => {
+        setFetchLoading(true);
         fetchCategories();
+        setFetchLoading(false);
     }, []);
 
     if(status === 'unauthenticated'){
         return redirect('/login');
     } else if(!isAdmin && loading) {
         return redirect('/profile');
+    } else if(status === 'loading' || fetchLoading || categories.length === 0){
+        return <ShimmerSpinner />
     }
     
     const deleteCategory = async({_id, name}: Category) => {
-
         if(confirm(`Are you sure, you want to delete ${name} ?`)){
             const deleteCategoryPromise = new Promise(async(resolve, reject) => {
                 const res = await fetch('/api/categories', {

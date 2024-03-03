@@ -1,6 +1,7 @@
 'use client';
 import AdminTabs from '@/components/AdminTabs';
 import Right from '@/components/icons/Right';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import useProfileCheck from '@/components/useProfileCheck';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -31,11 +32,10 @@ export default function MenuItems() {
 
     const {status} = useSession();
     const {loading, isAdmin} = useProfileCheck();
-
+    const [fetchLoading, setFetchLoading] = useState(false);
     const [menuItems, setMenuItems] = useState([]);
 
     useEffect(() => {
-
         const fetchMenuItems = async() => {
             const res = await fetch('/api/menu-items', {
                 method: 'GET',
@@ -47,15 +47,17 @@ export default function MenuItems() {
             }
 
         }
-
+        setFetchLoading(true);
         fetchMenuItems();
-
+        setFetchLoading(false);
     }, [])
 
     if(status === 'unauthenticated'){
         return redirect('/login');
     } else if(!isAdmin && loading) {
         return redirect('/profile');
+    } else if(status === 'loading' || fetchLoading || menuItems.length === 0 || !loading){
+        return <ShimmerSpinner />
     }
 
     return (

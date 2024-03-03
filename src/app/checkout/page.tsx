@@ -5,15 +5,18 @@ import BillDetails from '@/components/layout/BillDetails';
 import { redirect, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 
 export default function CheckoutPage() {
     const router = useRouter();
+    const {status} = useSession();
+    const [fetchLoading, setFetchLoading] = useState(false);
     const searchParams = useSearchParams();
     const orderId = searchParams.get('orderId');
     const orderStatus = searchParams.get('orderStatus');
     const [orderStatusBackend, setOrderStatusBackend] = useState('');
-
-    const [orderDetails, setOrderDetails] = useState<any>(null);
+    const [orderDetails, setOrderDetails] = useState<any>(null);    
 
     useEffect(() => {
         async function getOrderDetails(){
@@ -22,18 +25,22 @@ export default function CheckoutPage() {
             });
 
             const data = await res.json();
+            
             if(res.ok) {
-                setOrderDetails(data);
+                setOrderDetails(data);                
                 setOrderStatusBackend(data.orderStatus);
             }
         }   
         
+        setFetchLoading(true);
         getOrderDetails();
+        setFetchLoading(false);
 
     }, []);
     
 
     async function handleCheckout(){
+        setFetchLoading(true);
         const res = await fetch(`/api/orders/${orderId}`, {
             method: "PUT",
             headers: {
@@ -44,19 +51,26 @@ export default function CheckoutPage() {
             })
         });
         const data = await res.json();
+        
+        setFetchLoading(false);
         router.push(`/orders/${orderId}`);
-    }
-
-    if(orderDetails === null){
-        return <h1>Loading...</h1>
     }
 
     const address = `${orderDetails?.streetAddress}, ${orderDetails?.city}, ${orderDetails?.country} - ${orderDetails?.postal}`;
 
-    if(orderStatus !== orderStatusBackend){
+    if(!fetchLoading && orderStatusBackend !== '' && orderStatusBackend !== 'INITIATED'){
+        console.log(orderStatusBackend);
+        console.log(orderStatus);
+        
         return redirect(`/orders/${orderId}`);
     }
-    
+
+    if(status === 'unauthenticated'){
+        return redirect('/login');
+    } else if(fetchLoading || orderDetails === null){
+        return <ShimmerSpinner />
+    }
+
     return (
         <section className='mt-8'>
             <div className="text-center flex flex-col gap-4">
@@ -65,7 +79,7 @@ export default function CheckoutPage() {
             </div>
             <div className='md:grid grid-cols-12 gap-12 mt-8'>
                 <div className='col-span-4 p-4 md:p-0'>
-                    <BillDetails header={`Order Summary (${orderDetails?.cartProducts.length} item)`} cartProducts={orderDetails?.cartProducts} totalCartPrice={orderDetails?.cartValue} discountedPrice={orderDetails?.discountValue} finalCartPrice={orderDetails?.finalCartValue} />
+                    <BillDetails header={`Order Summary (${orderDetails?.cartProducts?.length} item)`} cartProducts={orderDetails?.cartProducts} totalCartPrice={orderDetails?.cartValue} discountedPrice={orderDetails?.discountValue} finalCartPrice={orderDetails?.finalCartValue} />
                 </div>
                 <div className="col-span-8 flex flex-col gap-3 p-3 md:p-0">
                     <div className='px-2 grow'>

@@ -2,6 +2,7 @@
 import AdminTabs from '@/components/AdminTabs';
 import EditableImage from '@/components/EditableImage';
 import UserAddressInputs from '@/components/layout/UserAddressInputs';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import { useSession } from 'next-auth/react'
 import Image from 'next/image';
 import Link from 'next/link';
@@ -55,16 +56,10 @@ export default function ProfilePage() {
     }, []);
 
     if(status === 'loading' || !profileFetched){
-        return 'Loading...';
+        return <ShimmerSpinner />;
     } else if(status === 'unauthenticated'){
         return redirect('/login');
     }
-
-    // useEffect(() => {
-    //     if(status === 'authenticated'){
-    //         const name = session.data?.user?.name as string;
-    //     }
-    // }, [status, session])
 
     async function handleProfileInfoUpdate(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();

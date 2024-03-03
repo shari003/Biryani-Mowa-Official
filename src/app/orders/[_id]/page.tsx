@@ -1,12 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react'
 import SectionHeaders from '@/components/SectionHeaders'
-import { useParams, useRouter } from 'next/navigation';
+import { redirect, useParams, useRouter } from 'next/navigation';
 import UserAddressInputs from '@/components/layout/UserAddressInputs';
 import CartProductLayout from '@/components/layout/CartProductLayout';
 import BillDetails from '@/components/layout/BillDetails';
 import useProfileCheck from '@/components/useProfileCheck';
 import toast from 'react-hot-toast';
+import { useSession } from 'next-auth/react';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 
 type SizeType = {
     name: string;
@@ -48,18 +50,22 @@ type OrderType = {
 
 export default function OrderPage() {
 
-    const [order, setOrder] = useState<OrderType | null>(null);
-    const [userDetails, setUserDetails] = useState<any>({});
-    const [editToggle, setEditToggle] = useState(false);
+    const {status} = useSession();
+    const {loading, isAdmin} = useProfileCheck();    
+    const [fetchLoading, setFetchLoading] = useState(false);
     const {_id} = useParams();
-    const {isAdmin} = useProfileCheck();
+    const router = useRouter();
+
+    const [editToggle, setEditToggle] = useState(false);
+    const [userDetails, setUserDetails] = useState<any>({});
+    const [order, setOrder] = useState<OrderType | null>(null);
+
     const orderStatuses = ['INITIATED', 'PLACED', 'CANCELED', 'ON THE WAY', 'DELIVERED'];
     const paymentTypes = ['COD', 'ONLINE'];
     const paymentStatus = ['PAID', 'NOT PAID'];
     const [selectedOrderStatus, setSelectedOrderStatus] = useState<any>(orderStatuses[0]);
     const [selectedPaymentType, setSelectedPaymentType] = useState<any>(paymentTypes[0]);
     const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<any>(paymentStatus[1]);
-    const router = useRouter();
     
     useEffect(() => {
         async function getOrder() {
@@ -74,7 +80,9 @@ export default function OrderPage() {
                 setSelectedPaymentStatus(data.paymentStatus ? paymentStatus[0] : paymentStatus[1]);
             }
         }
+        setFetchLoading(true);
         getOrder();
+        setFetchLoading(false);
     }, []);
 
     useEffect(() => {
@@ -91,11 +99,14 @@ export default function OrderPage() {
         }
 
         if(order?.userEmail){
+            setFetchLoading(true);
             getUserDetails();
+            setFetchLoading(false);
         }
     }, [order]);
 
     async function changeOrder(orderStatus: string, paymentMode : 'COD' | 'ONLINE', paymentStatus: 'PAID' | 'NOT PAID'){
+        setFetchLoading(true);
         const res = await fetch(`/api/orders/${_id}`, {
             method: "PUT",
             headers: {
@@ -116,6 +127,7 @@ export default function OrderPage() {
             toast.error(data.error)
         }
         
+        setFetchLoading(false);
         router.push('/orders');
     }
 
@@ -145,7 +157,11 @@ export default function OrderPage() {
     };
     if(order!==null) obj = {...order};
 
-
+    if(status === 'unauthenticated'){
+        return redirect('/login');
+    } else if(status === 'loading' || fetchLoading || !loading){
+        return <ShimmerSpinner />
+    }
 
     return (
         <section className='max-w-6xl mx-auto text-center mt-12'>

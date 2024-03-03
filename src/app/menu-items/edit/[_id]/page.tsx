@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import EditableForm from '@/components/EditableForm';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import useProfileCheck from '@/components/useProfileCheck';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
@@ -37,6 +38,7 @@ export default function EditMenuItem({params}: Props) {
 
     const {status} = useSession();
     const {loading, isAdmin} = useProfileCheck();
+    const [fetchLoading, setFetchLoading] = useState(false);
 
     const [menuItem, setMenuItem] = useState<MenuItemType>();
     const [redirection, setRedirection] = useState(false);
@@ -47,14 +49,12 @@ export default function EditMenuItem({params}: Props) {
             const data = await res.json();
             setMenuItem(data);
         }
+        setFetchLoading(true);
         fetchMenuItem();
+        setFetchLoading(false);
     }, [])
 
-    if(status === 'unauthenticated'){
-        return redirect('/login');
-    } else if(!isAdmin && loading) {
-        return redirect('/profile');
-    }
+
 
     const handleFormSubmit = async(itemName: string, itemDesc: string, itemPrice: string, menuImg: string, sizes: SizeType[], category: string, _priority: PriorityType) => {
         let newSizes:SizeType[] | [] = [];
@@ -92,11 +92,13 @@ export default function EditMenuItem({params}: Props) {
             }
         });
 
+        setFetchLoading(true);
         await toast.promise(saveMenuPromise, {
             loading: 'Updating Menu item...',
             success: (data) => `Updated ${data}`,
             error: (data) => data
         });
+        setFetchLoading(false);
     }
 
     const handleFormDelete = async(_id: string) => {
@@ -116,12 +118,13 @@ export default function EditMenuItem({params}: Props) {
             }
         });
 
+        setFetchLoading(true);
         await toast.promise(deleteMenuItemPromise, {
             loading: 'Deleting Menu item...',
             success: (data: any) => `Deleted ${data.itemName}`,
             error: (data) => data
         });
-
+        setFetchLoading(false);
     }
 
     if(redirection){
@@ -129,6 +132,13 @@ export default function EditMenuItem({params}: Props) {
         return redirect('/menu-items');
     }
     
+    if(status === 'unauthenticated'){
+        return redirect('/login');
+    } else if(!isAdmin && loading) {
+        return redirect('/profile');
+    } else if(status === 'loading' || fetchLoading || !loading){
+        return <ShimmerSpinner />
+    }
 
     return (
         <>

@@ -5,7 +5,9 @@ import Trash from '@/components/icons/Trash';
 import BillDetails from '@/components/layout/BillDetails';
 import CartProductLayout from '@/components/layout/CartProductLayout';
 import UserAddressInputs from '@/components/layout/UserAddressInputs';
+import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import useProfileCheck from '@/components/useProfileCheck';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import React, { useContext, useEffect, useState } from 'react'
@@ -66,7 +68,9 @@ export function calcCartProductsPrice(cartProds: MenuItemType[]) {
 
 export default function CartPage() {
 
-    const {userData} = useProfileCheck();    
+    const {status} = useSession();
+    const {userData, loading} = useProfileCheck();    
+    const [fetchLoading, setFetchLoading] = useState(false);
     const [address, setAddress] = useState({
         phone: '', 
         streetAddress: '', 
@@ -96,12 +100,10 @@ export default function CartPage() {
 
     const [coupon, setCoupon] = useState<CouponType>(couponInitialState);
 
-
-    const { cartProducts, clearCart, removeCartProduct }: ContextType = useContext<any>(CartContext);
+    const { cartProducts, clearCart }: ContextType = useContext<any>(CartContext);
 
     useEffect(() => {
         const totalCartValue = calcCartProductsPrice(cartProducts);
-
         setTotalCartPrice(totalCartValue);
         setFinalCartPrice(totalCartValue);
     }, [cartProducts])
@@ -121,8 +123,9 @@ export default function CartPage() {
     }, [userData]);
 
     async function placeOrder(ev: React.FormEvent<HTMLFormElement>) {
+        setFetchLoading(true);
+        
         ev.preventDefault();
-
         const filteredCartProducts = cartProducts.map(prod => {
             const {itemDesc, cartId, category, priority, createdAt, updatedAt, ...newObj} = prod;
             return newObj;
@@ -149,6 +152,8 @@ export default function CartPage() {
             setOrderDetails({orderId: data.orderId, orderStatus: data.orderStatus});
             setRedirection(true);
         }
+
+        setFetchLoading(false);
     }  
 
     function handleAddressChange(type: 'phone'| 'streetAddress' | 'city' | 'postal' | 'country', val: string) {
@@ -159,7 +164,6 @@ export default function CartPage() {
         setCoupon(couponInitialState);
         setDiscountedPrice(0);
         const totalCartValue = calcCartProductsPrice(cartProducts);
-
         setFinalCartPrice(totalCartValue);
     }
 
@@ -173,17 +177,17 @@ export default function CartPage() {
                 setCoupon(prev => ({...prev, couponDetails: ''}));
                 setCoupon(prev => ({...prev, couponError: false}));
                 const discount = 5/100;
-                const discountedPrice = totalCartPrice*discount;
-                setDiscountedPrice(discountedPrice);
+                const discountedPrice = (totalCartPrice*discount);
+                setDiscountedPrice(Number(discountedPrice.toFixed()));
                 const finalCartValue = totalCartPrice-discountedPrice;
-                setFinalCartPrice(finalCartValue);
+                setFinalCartPrice(Number(finalCartValue.toFixed()));
             } else {
                 setCoupon(prev => ({...prev, couponApplyStatus: true}));
                 setCoupon(prev => ({...prev, couponCodeLabel: 'Invalid'}));
                 setCoupon(prev => ({...prev, couponDetails: 'Invalid Coupon Code'}));
                 setCoupon(prev => ({...prev, couponError: true}));
                 setDiscountedPrice(0);
-                setFinalCartPrice(totalCartPrice);
+                setFinalCartPrice(Number(totalCartPrice.toFixed()));
             }
         }
     }
@@ -192,6 +196,12 @@ export default function CartPage() {
         clearCart();
         setRedirection(false);
         return redirect(`/checkout?orderId=${orderDetails.orderId}&orderStatus=${orderDetails.orderStatus}`);
+    }
+
+    if(status === 'unauthenticated'){
+        return redirect('/login');
+    } else if(status === 'loading' || fetchLoading || !loading){
+        return <ShimmerSpinner />
     }
 
     return (
