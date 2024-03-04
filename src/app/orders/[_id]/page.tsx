@@ -59,6 +59,7 @@ export default function OrderPage() {
     const [editToggle, setEditToggle] = useState(false);
     const [userDetails, setUserDetails] = useState<any>({});
     const [order, setOrder] = useState<OrderType | null>(null);
+    const [redirection, setRedirection] = useState(false); 
 
     const orderStatuses = ['INITIATED', 'PLACED', 'CANCELED', 'ON THE WAY', 'DELIVERED'];
     const paymentTypes = ['COD', 'ONLINE'];
@@ -78,6 +79,9 @@ export default function OrderPage() {
                 setSelectedOrderStatus(data.orderStatus);
                 setSelectedPaymentType(data.paymentMode);
                 setSelectedPaymentStatus(data.paymentStatus ? paymentStatus[0] : paymentStatus[1]);
+            } else {
+                toast.error(data.error);
+                setRedirection(true);
             }
         }
         setFetchLoading(true);
@@ -131,6 +135,29 @@ export default function OrderPage() {
         router.push('/orders');
     }
 
+    async function cancelOrder(orderStatus: string){
+        setFetchLoading(true);
+        const res = await fetch(`/api/orders/${_id}?cancelOrder=true`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                orderStatus,
+            })
+        });
+        const data = await res.json();
+        
+        if(res.ok){
+            toast.success('Order details updated')
+        } else {
+            toast.error(data.error)
+        }
+        
+        setFetchLoading(false);
+        router.push('/orders');
+    }
+
     function handleEditToggle(){
         if(editToggle){
             changeOrder(selectedOrderStatus, selectedPaymentType, selectedPaymentStatus);
@@ -161,11 +188,14 @@ export default function OrderPage() {
         return redirect('/login');
     } else if(status === 'loading' || fetchLoading || !loading){
         return <ShimmerSpinner />
+    } else if(redirection) {
+        setRedirection(false);
+        return redirect('/orders');
     }
 
     return (
         <section className='max-w-6xl mx-auto text-center mt-12'>
-            <SectionHeaders mainHeader={isAdmin && userDetails ? `${userDetails.name}'s Order` : 'Your Order'} />
+            <SectionHeaders mainHeader={isAdmin && userDetails && userDetails.name ? `${userDetails.name}'s Order` : 'Your Order'} />
             <div className="my-4">
                 <p>Thanks for placing your Order.</p>
             </div>
@@ -218,11 +248,16 @@ export default function OrderPage() {
                                 </span>
                             )}
                         </h1>
-                        <button onClick={handleEditToggle} type='button' className='bg-primary text-white md:w-1/6'>
+                        <button onClick={handleEditToggle} type='button' className='bg-primary text-white mx-auto md:mx-0 w-1/2 md:w-1/6'>
                             {editToggle ? 'Save' : 'Change'}
                         </button>
                     </>
                 )}
+                {order?.orderStatus !== 'CANCELED' && (
+                    <button onClick={() => cancelOrder('CANCELED')} type='button' className='bg-red-600 text-white mx-auto w-1/2 md:mx-0 md:w-1/6'>
+                        Cancel Order
+                    </button>
+                    )}
             </div>
             <div>
                 {order !== null && (

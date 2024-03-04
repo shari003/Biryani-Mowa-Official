@@ -17,6 +17,7 @@ export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
         if(session?.user){
             const order = await Order.findOne({_id});
             if(!order) throw new Error('No order found!!');
+            if(order.userEmail !== session.user.email) throw new Error('No order found!')
             return NextResponse.json(order);
         } else {
             return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
@@ -29,12 +30,19 @@ export async function GET(req: NextRequest, {params: {_id}}: ParamType) {
 export async function PUT(req: NextRequest, {params: {_id}}: ParamType) {
     try {
         connect();
+        const cancelOrder = req.nextUrl.searchParams.get('cancelOrder');
+        const data = await req.json();
+        
         if(await isAdmin()){
-            const data = await req.json();
             const order = await Order.findByIdAndUpdate(_id, data, {new: true});
             if(!order) throw new Error('Something went wrong')               ;
             return NextResponse.json(order);
-        } else {
+        } else if(cancelOrder) {
+            const order = await Order.findByIdAndUpdate(_id, data, {new: true});
+            if(!order) throw new Error('Something went wrong')               ;
+            return NextResponse.json(order);
+        }
+        else {
             return NextResponse.json({error: 'Cannot see the requested page.'}, {status: 401});
         }
         

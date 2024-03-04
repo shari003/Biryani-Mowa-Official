@@ -68,7 +68,7 @@ export default function Register() {
                 <div className="my-4 text-center text-slate-500">
                     or Signup with other accounts
                 </div>
-                <button type='button' onClick={() => signIn('google', {callbackUrl: '/'})} disabled={isLoading} className='flex items-center justify-center gap-4 bg-slate-100 oauth'><FontAwesomeIcon className='w-4' icon={faGoogle} /> Signup with Google </button>
+                <button type='button' onClick={() => signIn('google', {callbackUrl: '/'})} disabled={true} className='flex items-center justify-center gap-4 bg-slate-100 oauth'><FontAwesomeIcon className='w-4' icon={faGoogle} /> Signup with Google </button>
                 <div className='text-center my-8 border-t pt-4 border-slate-400'>
                     <h1>Already an user? <Link className='underline text-blue-600' href={'/login'}>Login</Link> here &raquo;.</h1>
                 </div>

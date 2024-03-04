@@ -38,7 +38,7 @@ export default function ProfilePage() {
         if('error' in data){
             toast.error(data.error);
         }
-
+        
         const {name, phone, streetAddress, city, postal, country, isAdmin} = data;
         setName(name);
         setPhone(phone);
@@ -116,13 +116,13 @@ export default function ProfilePage() {
 
             <AdminTabs isAdmin={isAdmin} />
 
-            <div className='max-w-2xl mx-auto mt-8'>
+            <div className='max-w-xl mx-auto mt-8'>
                 <div className='md:flex gap-2'>
-                    <div>
+                    {/* <div>
                         <div className="p-2 rounded-lg relative">
                             <EditableImage link={userImg} setLink={setUserImg} height={100} width={100} />
                         </div>
-                    </div>
+                    </div> */}
                     <form className='grow' onSubmit={handleProfileInfoUpdate}>
 
                         <label>Your name</label>

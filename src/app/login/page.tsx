@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function Login() {
 
@@ -20,9 +21,21 @@ export default function Login() {
         setIsLoading(true);
         setError('');
 
-        const r = await signIn('credentials', {email, password, callbackUrl: '/'});       
+        const loginData = {email, password, callbackUrl: '/profile', redirect: false};
+
+        const login = await signIn('credentials', loginData);       
 
         setIsLoading(false);
+
+        if(login?.ok){
+            toast.success('Successfully logged you in!');
+            router.push(login?.url!);
+        } else {
+            setEmail('');
+            setPassword('');
+            toast.error('Login failed.');
+        }
+
     }
     
     useEffect(() => {
@@ -50,7 +63,7 @@ export default function Login() {
                 <div className="my-4 text-center text-slate-500">
                     or Signup with other accounts
                 </div>
-                <button type='button' onClick={async() =>  await signIn('google', {callbackUrl: '/'})} disabled={isLoading} className='flex items-center justify-center gap-4 bg-slate-100 oauth'>
+                <button type='button' onClick={async() =>  await signIn('google', {callbackUrl: '/'})} disabled={true} className='flex items-center justify-center gap-4 bg-slate-100 oauth'>
                     <FontAwesomeIcon className='w-4' icon={faGoogle} /> Login with Google 
                 </button>
                 <div className='text-center my-8 border-t pt-4 border-slate-400'>

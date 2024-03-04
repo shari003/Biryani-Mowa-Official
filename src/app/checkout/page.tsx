@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
+import toast from 'react-hot-toast';
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -16,7 +17,8 @@ export default function CheckoutPage() {
     const orderId = searchParams.get('orderId');
     const orderStatus = searchParams.get('orderStatus');
     const [orderStatusBackend, setOrderStatusBackend] = useState('');
-    const [orderDetails, setOrderDetails] = useState<any>(null);    
+    const [orderDetails, setOrderDetails] = useState<any>(null); 
+    const [redirection, setRedirection] = useState(false);   
 
     useEffect(() => {
         async function getOrderDetails(){
@@ -29,6 +31,9 @@ export default function CheckoutPage() {
             if(res.ok) {
                 setOrderDetails(data);                
                 setOrderStatusBackend(data.orderStatus);
+            } else {
+                toast.error(data.error);
+                setRedirection(true);
             }
         }   
         
@@ -59,16 +64,16 @@ export default function CheckoutPage() {
     const address = `${orderDetails?.streetAddress}, ${orderDetails?.city}, ${orderDetails?.country} - ${orderDetails?.postal}`;
 
     if(!fetchLoading && orderStatusBackend !== '' && orderStatusBackend !== 'INITIATED'){
-        console.log(orderStatusBackend);
-        console.log(orderStatus);
-        
         return redirect(`/orders/${orderId}`);
     }
 
     if(status === 'unauthenticated'){
         return redirect('/login');
-    } else if(fetchLoading || orderDetails === null){
+    } else if((fetchLoading || orderDetails === null) && !redirection){
         return <ShimmerSpinner />
+    } else if(redirection) {
+        setRedirection(false);
+        return redirect('/orders');
     }
 
     return (
