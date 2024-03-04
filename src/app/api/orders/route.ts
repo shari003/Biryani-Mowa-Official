@@ -1,7 +1,8 @@
 import { connect } from "@/app/dbConfig/dbConfig";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions, isAdmin } from "../auth/[...nextauth]/route";
+import isAdmin from "@/app/utils/isAdmin";
+import { authOptions } from "@/app/utils/authOptions";
 import Order from "@/app/models/Orders";
 // import Stripe from "stripe";
 

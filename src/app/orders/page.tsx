@@ -9,9 +9,9 @@ import useProfileCheck from '@/components/useProfileCheck';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react';
 
-export default function OrdersPage() {
+function ToBeSuspended() {
 
     const session = useSession();
     const {status} = session;
@@ -62,23 +62,31 @@ export default function OrdersPage() {
 
     return (
         <section className='mt-8'>
-            <AdminTabs isAdmin={isAdmin} />
-            <div className="text-center my-8">
-                <SectionHeaders mainHeader={notAnAdmin === null ? 'Your Orders' : 'All Orders'} />
+        <AdminTabs isAdmin={isAdmin} />
+        <div className="text-center my-8">
+            <SectionHeaders mainHeader={notAnAdmin === null ? 'Your Orders' : 'All Orders'} />
+        </div>
+        {orders.length > 0 ? (
+            <div>
+                {orders.map((order: any) => (
+                    <Link key={order._id} href={`/orders/${order._id}`}>
+                        <OrderSlabs order={order} />
+                    </Link>
+                ))}
             </div>
-            {orders.length > 0 ? (
-                <div>
-                    {orders.map((order: any) => (
-                        <Link key={order._id} href={`/orders/${order._id}`}>
-                            <OrderSlabs order={order} />
-                        </Link>
-                    ))}
-                </div>
-            ) : (
-                <div className='text-center text-2xl font-semibold'>
-                    No Orders to show.
-                </div>
-            )}
+        ) : (
+            <div className='text-center text-2xl font-semibold'>
+                No Orders to show.
+            </div>
+        )}
         </section>
+    )
+}
+
+export default function OrdersPage() {
+    return (
+        <Suspense>
+            <ToBeSuspended />
+        </Suspense>
     )
 }

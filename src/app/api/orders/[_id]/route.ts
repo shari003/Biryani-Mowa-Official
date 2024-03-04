@@ -1,6 +1,7 @@
 import Order from "@/app/models/Orders";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions, isAdmin } from "../../auth/[...nextauth]/route";
+import isAdmin from "@/app/utils/isAdmin";
+import { authOptions } from "@/app/utils/authOptions";
 import { getServerSession } from "next-auth";
 import { connect } from "@/app/dbConfig/dbConfig";
 

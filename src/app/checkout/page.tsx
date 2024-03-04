@@ -8,8 +8,9 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import ShimmerSpinner from '@/components/shimmer/ShimmerSpinner';
 import toast from 'react-hot-toast';
+import { Suspense } from 'react';
 
-export default function CheckoutPage() {
+function ToBeSuspended() {
     const router = useRouter();
     const {status} = useSession();
     const [fetchLoading, setFetchLoading] = useState(false);
@@ -107,5 +108,13 @@ export default function CheckoutPage() {
                 </div>
             </div>
         </section>
+    )
+}
+
+export default function CheckoutPage(){
+    return (
+        <Suspense>
+            <ToBeSuspended />
+        </Suspense>
     )
 }

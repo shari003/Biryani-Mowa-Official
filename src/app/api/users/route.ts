@@ -1,6 +1,6 @@
 import User from "@/app/models/User";
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "../auth/[...nextauth]/route";
+import isAdmin from "@/app/utils/isAdmin";
 import { connect } from "@/app/dbConfig/dbConfig";
 
 export async function GET(req: NextRequest) {

@@ -1,7 +1,7 @@
 import { connect } from "@/app/dbConfig/dbConfig";
 import MenuItem from "@/app/models/MenuItems";
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "../auth/[...nextauth]/route";
+import isAdmin from "@/app/utils/isAdmin";
 
 export async function POST(req: NextRequest) {
     try {

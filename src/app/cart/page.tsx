@@ -49,7 +49,7 @@ type CouponType = {
     couponDetails: string
 }
 
-export function calcCartProductPrice(cartProd: MenuItemType) {
+export function calcCartProductPrice(cartProd: MenuItemType): number {
     let price = Number(cartProd.itemPrice);
     if(cartProd.sizes !== undefined && cartProd.sizes.length > 0){
         let sizePrice = cartProd.sizes.reduce((acc, curr) => acc+Number(curr.price), 0);
@@ -58,7 +58,7 @@ export function calcCartProductPrice(cartProd: MenuItemType) {
     return price;
 }
 
-export function calcCartProductsPrice(cartProds: MenuItemType[]) {
+export function calcCartProductsPrice(cartProds: MenuItemType[]): number {
     let totalPrice = 0;
     cartProds.forEach(prod => {
         totalPrice += calcCartProductPrice(prod);

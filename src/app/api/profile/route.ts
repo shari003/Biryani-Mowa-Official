@@ -1,7 +1,7 @@
 import { connect } from "@/app/dbConfig/dbConfig";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/app/utils/authOptions";
 import User from "@/app/models/User";
 
 export async function PUT(req: NextRequest){
